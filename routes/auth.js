@@ -1,44 +1,16 @@
-const jwt = require('jsonwebtoken');
+const express = require('express');
+const router = express.Router();
 
-// Protect routes (require login)
-const protect = (req, res, next) => {
-  try {
-    const token =
-      req.cookies?.token ||
-      req.headers.authorization?.split(' ')[1];
+const authController = require('../controllers/authController');
+const { redirectIfAuthenticated } = require('../middleware/auth');
 
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. No token provided.'
-      });
-    }
+// Pages
+router.get('/signup', redirectIfAuthenticated, authController.showSignup);
+router.get('/signin', redirectIfAuthenticated, authController.showSignin);
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+// Auth APIs
+router.post('/signup', authController.signup);
+router.post('/signin', authController.signin);
+router.post('/logout', authController.logout);
 
-    req.user = decoded;
-    next();
-
-  } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid token.'
-    });
-  }
-};
-
-// Redirect logged-in users away from signin/signup pages
-const redirectIfAuthenticated = (req, res, next) => {
-  const token = req.cookies?.token;
-
-  if (token) {
-    return res.redirect('/');
-  }
-
-  next();
-};
-
-module.exports = {
-  protect,
-  redirectIfAuthenticated
-};
+module.exports = router;
