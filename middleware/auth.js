@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = (req, res, next) => {
+// Protect routes (require login)
+const protect = (req, res, next) => {
   try {
     const token =
       req.cookies?.token ||
@@ -24,4 +25,20 @@ module.exports = (req, res, next) => {
       message: 'Invalid token.'
     });
   }
+};
+
+// Redirect logged-in users away from signin/signup pages
+const redirectIfAuthenticated = (req, res, next) => {
+  const token = req.cookies?.token;
+
+  if (token) {
+    return res.redirect('/');
+  }
+
+  next();
+};
+
+module.exports = {
+  protect,
+  redirectIfAuthenticated
 };
