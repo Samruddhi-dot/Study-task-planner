@@ -2,13 +2,19 @@ const express = require('express');
 const router = express.Router();
 
 const authController = require('../controllers/authController');
+const { redirectIfAuthenticated } = require('../middleware/auth');
 
-router.get('/signin', authController.showSignin);
-router.post('/signin', authController.signin);
+// ======================
+// PAGE ROUTES
+// ======================
+router.get('/signup', redirectIfAuthenticated, authController.showSignUp);
+router.get('/signin', redirectIfAuthenticated, authController.showSignIn);
 
-router.get('/signup', authController.showSignup);
-router.post('/signup', authController.signup);
-
+// ======================
+// AUTH ACTIONS
+// ======================
+router.post('/signup', authController.signUp);
+router.post('/signin', authController.signIn);
 router.post('/logout', authController.logout);
 
 module.exports = router;
