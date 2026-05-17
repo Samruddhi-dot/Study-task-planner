@@ -3,7 +3,7 @@
 // Task Routes
 // =============================================
 // All routes here are protected - require login
-
+console.log(taskController);
 const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
