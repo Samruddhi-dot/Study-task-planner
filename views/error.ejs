@@ -1,28 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Error <%= statusCode %> — StudyPlanner</title>
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title>Error</title>
 </head>
-<body class="error-page">
-  <div class="error-container">
-    <div class="error-code"><%= statusCode %></div>
-    <h1 class="error-title">
-      <%= statusCode === 404 ? "Page not found" : "Something went wrong" %>
-    </h1>
-    <p class="error-message"><%= message %></p>
-    <div class="error-actions">
-      <a href="/" class="btn btn-primary">Go Home</a>
-      <% if (user) { %>
-        <a href="/dashboard" class="btn btn-outline">Back to Dashboard</a>
-      <% } else { %>
-        <a href="/auth/signin" class="btn btn-outline">Sign In</a>
-      <% } %>
-    </div>
-  </div>
+<body>
+  <h1>Error</h1>
+  <p><%= message %></p>
 </body>
 </html>
