@@ -11,17 +11,15 @@ const showSignIn = (req, res) => {
   res.render('signin');
 };
 
-// SIGN UP
+// AUTH ACTIONS
 const signUp = async (req, res) => {
   res.send('signup working');
 };
 
-// SIGN IN
 const signIn = async (req, res) => {
   res.send('signin working');
 };
 
-// LOGOUT
 const logout = (req, res) => {
   res.clearCookie('token');
   res.redirect('/auth/signin');
