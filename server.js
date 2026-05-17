@@ -1,56 +1,29 @@
-require('dotenv').config();
-
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const path = require('path');
-
-// =========================
-// 1. IMPORTS (MUST BE FIRST)
-// =========================
-const authRoutes = require('./routes/auth');
-const taskRoutes = require('./routes/tasks');
-const { errorHandler, notFound } = require('./middleware/errorHandler');
-
-// =========================
-// 2. APP
-// =========================
-const app = express();
-
-// =========================
-// 3. VIEW ENGINE
-// =========================
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-
-// =========================
-// 4. MIDDLEWARE
-// =========================
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// =========================
-// 5. ROUTES
-// =========================
-app.get('/', (req, res) => {
-  res.render('index');
-});
-
-app.use('/auth', authRoutes);
-app.use('/', taskRoutes);
-
-// =========================
-// 6. ERROR HANDLERS (LAST)
-// =========================
-app.use(notFound);
-app.use(errorHandler);
-
-// =========================
-// 7. START SERVER
-// =========================
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
-});
+May 17 22:51:09.38
+GET
+404
+study-task-planner-zyd5-lcmhqdun0-samruddhi-dots-projects.vercel.app
+/favicon.png
+❌ Error: Page not found: /favicon.png
+May 17 22:51:09.29
+GET
+404
+study-task-planner-zyd5-lcmhqdun0-samruddhi-dots-projects.vercel.app
+/favicon.ico
+❌ Error: Page not found: /favicon.ico
+May 17 22:51:09.05
+GET
+500
+study-task-planner-zyd5-lcmhqdun0-samruddhi-dots-projects.vercel.app
+/
+❌ Error: /var/task/views/index.ejs:6 4| <meta charset="UTF-8"> 5| <meta name="viewport" content="width=device-width, initial-scale=1.0"> >> 6| <title><%= title %></title> 7| <link rel="stylesheet" href="/css/style.css"> 8| <link rel="preconnect" href="https://fonts.googleapis.com"> 9| <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"> title is not defined
+May 17 22:51:07.63
+GET
+500
+study-task-planner-zyd5-lcmhqdun0-samruddhi-dots-projects.vercel.app
+/
+3
+❌ Error: /var/task/views/index.ejs:6 4| <meta charset="UTF-8"> 5| <meta name="viewport" content="width=device-width, initial-scale=1.0"> >> 6| <title><%= title %></title> 7| <link rel="stylesheet" href="/css/style.css"> 8| <link rel="preconnect" href="https://fonts.googleapis.com"> 9| <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"> title is not defined
+May 17 22:51:07.59
+GET
+500
+study-task-planner-zyd5-lcmhqdun0-samruddhi-dots-projects.vercel.app
