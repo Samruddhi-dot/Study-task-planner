@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — StudyPlanner</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-panel left-panel">
+      <a href="/" class="auth-logo">
+        <span>📚</span> StudyPlanner
+      </a>
+      <div class="auth-illustration">
+        <div class="floating-cards">
+          <div class="fc fc1">📐 Geometry</div>
+          <div class="fc fc2">🧬 Biology</div>
+          <div class="fc fc3">📜 History</div>
+          <div class="fc fc4">⚗️ Chemistry</div>
+        </div>
+        <h2 class="panel-tagline">Plan. Study.<br>Succeed.</h2>
+        <p class="panel-sub">Join thousands of students who plan their way to better grades.</p>
+      </div>
+    </div>
+
+    <div class="auth-panel right-panel">
+      <div class="auth-form-wrapper">
+        <div class="auth-header">
+          <h1>Create your account</h1>
+          <p>Start organizing your studies today</p>
+        </div>
+
+        <% if (error) { %>
+          <div class="alert alert-error">⚠️ <%= error %></div>
+        <% } %>
+        <% if (success) { %>
+          <div class="alert alert-success">✅ <%= success %></div>
+        <% } %>
+
+        <form id="signupForm" class="auth-form">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              placeholder="e.g. Alex Johnson"
+              required
+              autocomplete="name"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="you@example.com"
+              required
+              autocomplete="email"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-with-icon">
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                placeholder="At least 6 characters"
+                required
+                minlength="6"
+                autocomplete="new-password"
+              >
+              <button type="button" class="toggle-password" onclick="togglePassword('password')">👁</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <div class="input-with-icon">
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                name="confirmPassword" 
+                placeholder="Repeat your password"
+                required
+                autocomplete="new-password"
+              >
+              <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">👁</button>
+            </div>
+          </div>
+
+          <div id="formError" class="alert alert-error" style="display:none;"></div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+            <span class="btn-text">Create Account</span>
+            <span class="btn-loading" style="display:none;">Creating...</span>
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          Already have an account? <a href="/auth/signin">Sign in</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const errorDiv = document.getElementById('formError');
+      const submitBtn = document.getElementById('submitBtn');
+      const btnText = submitBtn.querySelector('.btn-text');
+      const btnLoading = submitBtn.querySelector('.btn-loading');
+
+      // Get form values
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      // Client-side validation
+      if (password !== confirmPassword) {
+        errorDiv.textContent = '⚠️ Passwords do not match';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      // Show loading state
+      btnText.style.display = 'none';
+      btnLoading.style.display = 'inline';
+      submitBtn.disabled = true;
+      errorDiv.style.display = 'none';
+
+      try {
+        const response = await fetch('/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, confirmPassword })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Redirect to dashboard on success
+          window.location.href = '/dashboard';
+        } else {
+          errorDiv.textContent = '⚠️ ' + data.message;
+          errorDiv.style.display = 'block';
+        }
+      } catch (err) {
+        errorDiv.textContent = '⚠️ Network error. Please try again.';
+        errorDiv.style.display = 'block';
+      } finally {
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
