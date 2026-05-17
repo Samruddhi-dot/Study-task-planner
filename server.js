@@ -32,6 +32,11 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/', taskRoutes);
 
+// Fix favicon
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
+});
+
 // 404 handler
 app.use(notFound);
 
