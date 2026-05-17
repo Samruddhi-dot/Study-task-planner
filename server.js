@@ -8,6 +8,8 @@
 // Load environment variables FIRST (before any other imports)
 require('dotenv').config();
 
+console.log('authRoutes:', authRoutes);
+console.log('taskRoutes:', taskRoutes);
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
