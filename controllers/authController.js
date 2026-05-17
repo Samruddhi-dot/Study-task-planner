@@ -1,16 +1,36 @@
-const express = require('express');
-const router = express.Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { supabaseAdmin } = require('../config/supabase');
 
-const authController = require('../controllers/authController');
-const { redirectIfAuthenticated } = require('../middleware/auth');
+// SHOW PAGES
+const showSignUp = (req, res) => {
+  res.render('signup');
+};
 
-// Pages
-router.get('/signup', redirectIfAuthenticated, authController.showSignUp);
-router.get('/signin', redirectIfAuthenticated, authController.showSignIn);
+const showSignIn = (req, res) => {
+  res.render('signin');
+};
 
-// Auth actions
-router.post('/signup', authController.signUp);
-router.post('/signin', authController.signIn);
-router.post('/logout', authController.logout);
+// SIGN UP
+const signUp = async (req, res) => {
+  res.send('signup working');
+};
 
-module.exports = router;
+// SIGN IN
+const signIn = async (req, res) => {
+  res.send('signin working');
+};
+
+// LOGOUT
+const logout = (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/auth/signin');
+};
+
+module.exports = {
+  showSignUp,
+  showSignIn,
+  signUp,
+  signIn,
+  logout
+};
