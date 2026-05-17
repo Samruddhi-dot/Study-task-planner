@@ -1,33 +1,44 @@
-// routes/auth.js
-// =============================================
-// Authentication Routes
-// =============================================
+const jwt = require('jsonwebtoken');
 
-const express = require('express');
-const router = express.Router();
-const authController = require('../controllers/authController');
-const { redirectIfAuthenticated } = require('../middleware/auth');
+// Protect routes (require login)
+const protect = (req, res, next) => {
+  try {
+    const token =
+      req.cookies?.token ||
+      req.headers.authorization?.split(' ')[1];
 
-// --- Page Routes (GET) ---
-// Show signup page (redirect to dashboard if already logged in)
-router.get('/signup', redirectIfAuthenticated, authController.showSignUp);
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Access denied. No token provided.'
+      });
+    }
 
-// Show signin page (redirect to dashboard if already logged in)
-router.get('/signin', redirectIfAuthenticated, authController.showSignIn);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-// --- API Routes (POST) ---
-// Register a new user
-// Endpoint: POST /auth/signup
-// Body: { name, email, password, confirmPassword }
-router.post('/signup', authController.signUp);
+    req.user = decoded;
+    next();
 
-// Log in an existing user
-// Endpoint: POST /auth/signin
-// Body: { email, password }
-router.post('/signin', authController.signIn);
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid token.'
+    });
+  }
+};
 
-// Log out (clears cookie)
-// Endpoint: POST /auth/logout
-router.post('/logout', authController.logout);
+// Redirect logged-in users away from signin/signup pages
+const redirectIfAuthenticated = (req, res, next) => {
+  const token = req.cookies?.token;
 
-module.exports = router;
+  if (token) {
+    return res.redirect('/');
+  }
+
+  next();
+};
+
+module.exports = {
+  protect,
+  redirectIfAuthenticated
+};
