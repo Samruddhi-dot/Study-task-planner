@@ -45,18 +45,16 @@ const requireAuthPage = (req, res, next) => {
 
 // Redirect logged-in users away from login pages
 const redirectIfAuthenticated = (req, res, next) => {
+  const token = req.cookies?.token;
+
+  if (!token) return next();
+
   try {
-    const token = req.cookies?.token;
-
-    if (token) {
-      jwt.verify(token, process.env.JWT_SECRET);
-      return res.redirect('/dashboard');
-    }
-
-    next();
-  } catch (error) {
+    jwt.verify(token, process.env.JWT_SECRET);
+    return res.redirect('/dashboard');
+  } catch (err) {
     res.clearCookie('token');
-    next();
+    return next();
   }
 };
 
