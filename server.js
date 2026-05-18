@@ -71,6 +71,9 @@ const requireAuth = (req, res, next) => {
 // DASHBOARD (SAFE)
 // ======================
 app.get('/dashboard', requireAuth, async (req, res) => {
+
+  console.log("🔥 NEW DASHBOARD ROUTE HIT"); // 👈 PUT HERE
+
   try {
     const { data: user, error } = await supabaseAdmin
       .from('users')
