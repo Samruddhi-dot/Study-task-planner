@@ -83,7 +83,10 @@ app.get('/dashboard', requireAuth, async (req, res) => {
     }
 
     return res.render('dashboard', {
-      user,   // ✅ FULL USER HERE
+      user: {
+        name: user.name || "User",
+        email: user.email || ""
+      },
       stats: {
         total: 0,
         pending: 0,
