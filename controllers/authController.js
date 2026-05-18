@@ -80,8 +80,6 @@ const signIn = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log("SIGNIN BODY:", req.body);
-
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -95,12 +93,17 @@ const signIn = async (req, res) => {
       .from('users')
       .select('*')
       .eq('email', cleanEmail)
-      .single();
+      .maybeSingle();
 
-    console.log("USER FROM DB:", user);
-    console.log("DB ERROR:", error);
+    if (error) {
+      console.log("DB ERROR:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Database error"
+      });
+    }
 
-    if (error || !user) {
+    if (!user) {
       return res.status(404).json({
         success: false,
         message: "User not found"
@@ -110,7 +113,7 @@ const signIn = async (req, res) => {
     if (!user.password) {
       return res.status(500).json({
         success: false,
-        message: "Password not found in database"
+        message: "Password missing in DB"
       });
     }
 
@@ -136,16 +139,13 @@ const signIn = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000
     });
 
-    console.log("LOGIN SUCCESS - COOKIE SET");
-
     return res.status(200).json({
       success: true,
       message: "Login successful"
     });
 
   } catch (err) {
-    console.log("🔥 SIGNIN ERROR:", err);
-
+    console.log("SIGNIN ERROR:", err);
     return res.status(500).json({
       success: false,
       message: err.message
