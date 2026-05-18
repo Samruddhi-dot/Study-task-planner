@@ -190,16 +190,35 @@ const showDashboard = async (req, res) => {
       .select('*')
       .eq('user_id', userId);
 
-    res.render('dashboard', {
-      user: req.user,
-      tasks: tasks || []
+    return res.render('dashboard', {
+      user: {
+        name: req.user?.name || "User",
+        email: req.user?.email || ""
+      },
+      tasks: tasks || [],
+      subjects: [],
+      stats: {
+        total: tasks?.length || 0,
+        pending: tasks?.filter(t => !t.completed).length || 0,
+        completed: tasks?.filter(t => t.completed).length || 0,
+        overdue: 0
+      }
     });
 
   } catch (err) {
-    res.render('dashboard', { user: req.user, tasks: [] });
+    return res.render('dashboard', {
+      user: { name: "User", email: "" },
+      tasks: [],
+      subjects: [],
+      stats: {
+        total: 0,
+        pending: 0,
+        completed: 0,
+        overdue: 0
+      }
+    });
   }
 };
-
 /* ---------------------------
    EXPORTS (IMPORTANT FIX)
 ---------------------------- */
