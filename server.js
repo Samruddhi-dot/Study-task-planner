@@ -32,6 +32,24 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/', taskRoutes);
 
+// Dashboard route ← ADD THIS
+app.get('/dashboard', (req, res) => {
+  res.render('dashboard', {
+    user: {
+      name: 'Samruddhi',
+      email: 'test@example.com'
+    },
+    stats: {
+      total: 0,
+      pending: 0,
+      completed: 0,
+      overdue: 0
+    },
+    tasks: [],
+    subjects: []
+  });
+});
+
 // Fix favicon
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
