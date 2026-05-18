@@ -22,11 +22,13 @@ const showSignIn = (req, res) => {
 };
 
 // ======================
-// SIGN UP (FIXED - SUPPORTS NAME)
+// SIGN UP
 // ======================
 const signUp = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
+    console.log("SIGNUP BODY:", req.body);
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -48,6 +50,8 @@ const signUp = async (req, res) => {
       ]);
 
     if (error) {
+      console.log("SUPABASE SIGNUP ERROR:", error);
+
       return res.status(400).json({
         success: false,
         message: error.message
@@ -60,13 +64,13 @@ const signUp = async (req, res) => {
     });
 
   } catch (err) {
-  console.log("🔥 SIGNUP ERROR:", err);
+    console.log("🔥 SIGNUP ERROR:", err);
 
-  return res.status(500).json({
-    success: false,
-    message: err.message
-  });
-}
+    return res.status(500).json({
+      success: false,
+      message: err.message
+    });
+  }
 };
 
 // ======================
@@ -75,6 +79,8 @@ const signUp = async (req, res) => {
 const signIn = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    console.log("SIGNIN BODY:", req.body);
 
     if (!email || !password) {
       return res.status(400).json({
@@ -91,10 +97,20 @@ const signIn = async (req, res) => {
       .eq('email', cleanEmail)
       .single();
 
+    console.log("USER FROM DB:", user);
+    console.log("DB ERROR:", error);
+
     if (error || !user) {
       return res.status(404).json({
         success: false,
         message: "User not found"
+      });
+    }
+
+    if (!user.password) {
+      return res.status(500).json({
+        success: false,
+        message: "Password not found in database"
       });
     }
 
@@ -128,10 +144,11 @@ const signIn = async (req, res) => {
     });
 
   } catch (err) {
-    console.log("SignIn Error:", err);
+    console.log("🔥 SIGNIN ERROR:", err);
+
     return res.status(500).json({
       success: false,
-      message: "Server error"
+      message: err.message
     });
   }
 };
