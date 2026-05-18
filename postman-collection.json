@@ -1,0 +1,173 @@
+{
+  "info": {
+    "name": "Study Planner API",
+    "description": "Complete API collection for the Study Planner app.\n\nINSTRUCTIONS:\n1. Import this file into Postman\n2. Set the BASE_URL variable to http://localhost:3000\n3. Run 'Sign Up' first, then use the returned token\n4. Set the TOKEN variable with the token from Sign Up/Sign In response\n5. All task routes require the Authorization header",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:3000", "type": "string" },
+    { "key": "TOKEN", "value": "your-jwt-token-here", "type": "string" },
+    { "key": "TASK_ID", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "1. Sign Up - Create Account",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alex Johnson\",\n  \"email\": \"alex@example.com\",\n  \"password\": \"password123\",\n  \"confirmPassword\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{BASE_URL}}/auth/signup", "host": ["{{BASE_URL}}"], "path": ["auth", "signup"] },
+            "description": "Create a new user account.\n\nAfter success, copy the 'token' from the response and set it as the TOKEN variable in your Postman environment."
+          }
+        },
+        {
+          "name": "2. Sign In - Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{BASE_URL}}/auth/signin", "host": ["{{BASE_URL}}"], "path": ["auth", "signin"] },
+            "description": "Login with existing credentials. Returns a JWT token to use for authenticated requests."
+          }
+        },
+        {
+          "name": "3. Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": { "raw": "{{BASE_URL}}/auth/logout", "host": ["{{BASE_URL}}"], "path": ["auth", "logout"] },
+            "description": "Logs out the user by clearing the auth cookie."
+          }
+        }
+      ]
+    },
+    {
+      "name": "📚 Tasks",
+      "item": [
+        {
+          "name": "4. Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/tasks",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks"],
+              "query": [
+                { "key": "subject", "value": "Math", "disabled": true, "description": "Filter by subject" },
+                { "key": "completed", "value": "false", "disabled": true, "description": "Filter by status: true or false" },
+                { "key": "sortBy", "value": "deadline", "disabled": true, "description": "Sort: deadline, priority, created_at" },
+                { "key": "order", "value": "asc", "disabled": true, "description": "Order: asc or desc" }
+              ]
+            },
+            "description": "Get all tasks for the logged-in user.\n\nOptional query params:\n- subject=Math (filter by subject, partial match)\n- completed=true/false (filter by status)\n- sortBy=deadline/priority/created_at\n- order=asc/desc"
+          }
+        },
+        {
+          "name": "5. Create New Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Read Chapter 5 — Cell Biology\",\n  \"subject\": \"Biology\",\n  \"deadline\": \"2025-12-20\",\n  \"priority\": \"High\",\n  \"notes\": \"Focus on mitosis and meiosis sections\"\n}"
+            },
+            "url": { "raw": "{{BASE_URL}}/tasks", "host": ["{{BASE_URL}}"], "path": ["tasks"] },
+            "description": "Create a new study task.\n\nRequired: title\nOptional: subject, deadline (YYYY-MM-DD), priority (High/Medium/Low), notes\n\nCopy the 'id' from the response and set it as the TASK_ID variable."
+          }
+        },
+        {
+          "name": "6. Update Task (Full Update)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Read Chapter 5 & 6 — Cell Biology\",\n  \"subject\": \"Biology\",\n  \"deadline\": \"2025-12-22\",\n  \"priority\": \"High\",\n  \"notes\": \"Updated: also cover Chapter 6 — DNA Replication\"\n}"
+            },
+            "url": { "raw": "{{BASE_URL}}/tasks/{{TASK_ID}}", "host": ["{{BASE_URL}}"], "path": ["tasks", "{{TASK_ID}}"] },
+            "description": "Update a task's fields. Replace TASK_ID with the actual task ID.\n\nYou can update any combination of fields."
+          }
+        },
+        {
+          "name": "7. Toggle Task Complete",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/tasks/{{TASK_ID}}/complete",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks", "{{TASK_ID}}", "complete"]
+            },
+            "description": "Toggle the completion status of a task.\n\nIf the task is pending → marks it complete.\nIf the task is complete → marks it pending.\n\nNo request body needed."
+          }
+        },
+        {
+          "name": "8. Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/tasks/{{TASK_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks", "{{TASK_ID}}"]
+            },
+            "description": "Permanently delete a task. This cannot be undone."
+          }
+        },
+        {
+          "name": "9. Get Tasks - Filter by Subject",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/tasks?subject=Math",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks"],
+              "query": [{ "key": "subject", "value": "Math" }]
+            },
+            "description": "Get only tasks where the subject contains 'Math' (case-insensitive)."
+          }
+        },
+        {
+          "name": "10. Get Tasks - Pending Only",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/tasks?completed=false&sortBy=deadline",
+              "host": ["{{BASE_URL}}"],
+              "path": ["tasks"],
+              "query": [
+                { "key": "completed", "value": "false" },
+                { "key": "sortBy", "value": "deadline" }
+              ]
+            },
+            "description": "Get only pending (not completed) tasks, sorted by deadline."
+          }
+        }
+      ]
+    }
+  ]
+}
