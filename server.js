@@ -1,9 +1,8 @@
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+require('dotenv').config();
 
+const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
@@ -12,6 +11,7 @@ const { errorHandler, notFound } = require('./middleware/errorHandler');
 const app = express();
 
 console.log("JWT_SECRET =", process.env.JWT_SECRET);
+
 // ======================
 // VIEW ENGINE
 // ======================
@@ -42,7 +42,7 @@ app.use('/auth', authRoutes);
 app.use('/', taskRoutes);
 
 // ======================
-// DASHBOARD (PROTECTED VERSION)
+// AUTH MIDDLEWARE
 // ======================
 const requireAuth = (req, res, next) => {
   const token = req.cookies.token;
@@ -61,17 +61,13 @@ const requireAuth = (req, res, next) => {
   }
 };
 
+// ======================
+// DASHBOARD
+// ======================
 app.get('/dashboard', requireAuth, (req, res) => {
   res.render('dashboard', {
-    user: {
-      id: req.user.id
-    },
-    stats: {
-      total: 0,
-      pending: 0,
-      completed: 0,
-      overdue: 0
-    },
+    user: { id: req.user.id },
+    stats: { total: 0, pending: 0, completed: 0, overdue: 0 },
     tasks: [],
     subjects: []
   });
