@@ -78,22 +78,12 @@ app.get('/dashboard', requireAuth, async (req, res) => {
       .eq('id', req.user.id)
       .single();
 
-   if (error || !user) {
-  return res.render('dashboard', {
-    user: { name: "User", email: "" },
-    stats: {
-      total: 0,
-      pending: 0,
-      completed: 0,
-      overdue: 0
-    },
-    tasks: [],
-    subjects: []
-  });
-}
+    if (error || !user) {
+      return res.redirect('/auth/signin');
+    }
 
     return res.render('dashboard', {
-      user: user || { name: "User", email: "" },
+      user,   // ✅ FULL USER HERE
       stats: {
         total: 0,
         pending: 0,
@@ -105,11 +95,10 @@ app.get('/dashboard', requireAuth, async (req, res) => {
     });
 
   } catch (err) {
-    console.log("Dashboard crash:", err.message);
+    console.log("Dashboard error:", err);
     return res.redirect('/auth/signin');
   }
 });
-
 // ======================
 // FAVICON FIX
 // ======================
