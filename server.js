@@ -7,8 +7,9 @@ const jwt = require('jsonwebtoken');
 
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
+const taskController = require('./controllers/taskController');
+
 const { errorHandler, notFound } = require('./middleware/errorHandler');
-const { supabaseAdmin } = require('./config/supabase');
 
 const app = express();
 
@@ -32,7 +33,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ======================
-// HOME PAGE
+// HOME
 // ======================
 app.get('/', (req, res) => {
   res.render('index', {
@@ -41,21 +42,13 @@ app.get('/', (req, res) => {
 });
 
 // ======================
-// AUTH ROUTES
-// ======================
-app.use('/auth', authRoutes);
-app.use('/', taskRoutes);
-
-// ======================
-// SAFE AUTH MIDDLEWARE
+// AUTH MIDDLEWARE
 // ======================
 const requireAuth = (req, res, next) => {
   try {
     const token = req.cookies?.token;
 
-    if (!token) {
-      return res.redirect('/auth/signin');
-    }
+    if (!token) return res.redirect('/auth/signin');
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
@@ -68,52 +61,23 @@ const requireAuth = (req, res, next) => {
 };
 
 // ======================
-// DASHBOARD (SAFE)
+// ROUTES
 // ======================
-app.get('/dashboard', requireAuth, async (req, res) => {
+app.use('/auth', authRoutes);
+app.use('/tasks', taskRoutes);
 
-  console.log("🔥 NEW DASHBOARD ROUTE HIT"); // 👈 PUT HERE
+// ✅ SINGLE CLEAN DASHBOARD ROUTE
+app.get('/dashboard', requireAuth, taskController.showDashboard);
 
-  try {
-    const { data: user, error } = await supabaseAdmin
-      .from('users')
-      .select('id, name, email')
-      .eq('id', req.user.id)
-      .single();
-
-    if (error || !user) {
-      return res.redirect('/auth/signin');
-    }
-
-    return res.render('dashboard', {
-      user: {
-        name: user.name || "User",
-        email: user.email || ""
-      },
-      stats: {
-        total: 0,
-        pending: 0,
-        completed: 0,
-        overdue: 0
-      },
-      tasks: [],
-      subjects: []
-    });
-
-  } catch (err) {
-    console.log("Dashboard error:", err);
-    return res.redirect('/auth/signin');
-  }
-});
 // ======================
-// FAVICON FIX
+// FAVICON
 // ======================
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
 });
 
 // ======================
-// ERROR HANDLERS
+// ERROR HANDLING
 // ======================
 app.use(notFound);
 app.use(errorHandler);
