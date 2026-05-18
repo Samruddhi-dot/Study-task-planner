@@ -110,13 +110,7 @@ const signIn = async (req, res) => {
       });
     }
 
-    if (!user.password) {
-      return res.status(500).json({
-        success: false,
-        message: "Password missing in DB"
-      });
-    }
-
+    // 🔐 CHECK PASSWORD
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -126,16 +120,18 @@ const signIn = async (req, res) => {
       });
     }
 
+    // 🔑 CREATE JWT
     const token = jwt.sign(
       { id: user.id },
       process.env.JWT_SECRET,
-      { expiresIn: '1d' }
+      { expiresIn: "1d" }
     );
 
-    res.cookie('token', token, {
+    // 🍪 SET COOKIE
+    res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,   // IMPORTANT for Vercel
+      sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000
     });
 
@@ -146,6 +142,7 @@ const signIn = async (req, res) => {
 
   } catch (err) {
     console.log("SIGNIN ERROR:", err);
+
     return res.status(500).json({
       success: false,
       message: err.message
