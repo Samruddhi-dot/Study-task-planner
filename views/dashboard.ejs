@@ -29,7 +29,9 @@
       </a>
     </nav>
     <div class="sidebar-user">
-      <div class="user-avatar"><%= user.name.charAt(0).toUpperCase() %></div>
+      <div class="user-avatar">
+  <%= (user.name || "U").charAt(0).toUpperCase() %>
+</div>
       <div class="user-info">
         <div class="user-name"><%= user.name %></div>
         <div class="user-email"><%= user.email %></div>
