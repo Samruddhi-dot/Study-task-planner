@@ -2,7 +2,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { supabaseAdmin } = require('../config/supabase');
 
+// ======================
 // SHOW PAGES
+// ======================
 const showSignUp = (req, res) => {
   res.render('signup', {
     title: 'Study Planner',
@@ -19,27 +21,32 @@ const showSignIn = (req, res) => {
   });
 };
 
-// AUTH ACTIONS
+// ======================
+// SIGN UP (TEMP - you can extend later)
+// ======================
 const signUp = async (req, res) => {
-  res.json({
+  return res.status(200).json({
     success: true,
-    message: 'signup working'
+    message: "Signup working"
   });
 };
 
+// ======================
+// SIGN IN (FIXED)
+// ======================
 const signIn = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Validate input
     if (!email || !password) {
-      return res.render('signin', {
-        title: 'Study Planner',
-        error: 'Email and password are required',
-        message: null
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required"
       });
     }
 
-    // 1. Get user from Supabase
+    // Get user from Supabase
     const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('*')
@@ -47,32 +54,30 @@ const signIn = async (req, res) => {
       .single();
 
     if (error || !user) {
-      return res.render('signin', {
-        title: 'Study Planner',
-        error: 'User not found',
-        message: null
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
       });
     }
 
-    // 2. Check password
+    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.render('signin', {
-        title: 'Study Planner',
-        error: 'Invalid password',
-        message: null
+      return res.status(401).json({
+        success: false,
+        message: "Invalid password"
       });
     }
 
-    // 3. Create token
+    // Create JWT token
     const token = jwt.sign(
       { id: user.id },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
 
-    // 4. Set cookie (IMPORTANT FIX)
+    // Set cookie
     res.cookie('token', token, {
       httpOnly: true,
       secure: false,   // localhost only
@@ -82,20 +87,32 @@ const signIn = async (req, res) => {
 
     console.log("LOGIN SUCCESS - COOKIE SET");
 
-    // 5. Redirect
-    return res.redirect('/');
+    // Send JSON response (IMPORTANT for fetch)
+    return res.status(200).json({
+      success: true,
+      message: "Login successful"
+    });
 
   } catch (err) {
     console.log("SignIn Error:", err);
-    return res.status(500).send('Server error');
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 };
 
+// ======================
+// LOGOUT
+// ======================
 const logout = (req, res) => {
   res.clearCookie('token');
-  res.redirect('/auth/signin');
+  return res.redirect('/auth/signin');
 };
 
+// ======================
+// EXPORTS
+// ======================
 module.exports = {
   showSignUp,
   showSignIn,
