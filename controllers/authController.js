@@ -21,11 +21,17 @@ const showSignIn = (req, res) => {
 
 // AUTH ACTIONS
 const signUp = async (req, res) => {
-  res.send('signup working');
+  res.json({
+    success: true,
+    message: 'signup working'
+  });
 };
 
 const signIn = async (req, res) => {
-  res.send('signin working');
+  res.json({
+    success: true,
+    message: 'signin working'
+  });
 };
 
 const logout = (req, res) => {
