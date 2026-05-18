@@ -78,10 +78,19 @@ app.get('/dashboard', requireAuth, async (req, res) => {
       .eq('id', req.user.id)
       .single();
 
-    if (error || !user) {
-      console.log("Supabase error:", error?.message);
-      return res.redirect('/auth/signin');
-    }
+   if (error || !user) {
+  return res.render('dashboard', {
+    user: { name: "User", email: "" },
+    stats: {
+      total: 0,
+      pending: 0,
+      completed: 0,
+      overdue: 0
+    },
+    tasks: [],
+    subjects: []
+  });
+}
 
     return res.render('dashboard', {
       user: user || { name: "User", email: "" },
