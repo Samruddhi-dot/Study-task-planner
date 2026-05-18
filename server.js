@@ -3,10 +3,12 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
+const { supabaseAdmin } = require('./config/supabase');
 
 const app = express();
 
@@ -52,7 +54,6 @@ const requireAuth = (req, res, next) => {
   }
 
   try {
-    const jwt = require('jsonwebtoken');
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
@@ -62,15 +63,27 @@ const requireAuth = (req, res, next) => {
 };
 
 // ======================
-// DASHBOARD
+// DASHBOARD (FIXED)
 // ======================
-app.get('/dashboard', requireAuth, (req, res) => {
-  res.render('dashboard', {
-    user: { id: req.user.id },
-    stats: { total: 0, pending: 0, completed: 0, overdue: 0 },
-    tasks: [],
-    subjects: []
-  });
+app.get('/dashboard', requireAuth, async (req, res) => {
+  try {
+    const { data: user } = await supabaseAdmin
+      .from('users')
+      .select('*')
+      .eq('id', req.user.id)
+      .single();
+
+    res.render('dashboard', {
+      user: user || { name: "User", email: "" },
+      stats: { total: 0, pending: 0, completed: 0, overdue: 0 },
+      tasks: [],
+      subjects: []
+    });
+
+  } catch (err) {
+    console.log(err);
+    return res.redirect('/auth/signin');
+  }
 });
 
 // ======================
