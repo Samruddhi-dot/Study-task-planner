@@ -22,13 +22,49 @@ const showSignIn = (req, res) => {
 };
 
 // ======================
-// SIGN UP (TEMP - you can extend later)
+// SIGN UP (FIXED - NOW SAVES USER)
 // ======================
 const signUp = async (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "Signup working"
-  });
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required"
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const { error } = await supabaseAdmin
+      .from('users')
+      .insert([
+        {
+          email: email.trim().toLowerCase(),
+          password: hashedPassword
+        }
+      ]);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User created successfully"
+    });
+
+  } catch (err) {
+    console.log("SignUp Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
 };
 
 // ======================
@@ -38,7 +74,6 @@ const signIn = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -46,11 +81,13 @@ const signIn = async (req, res) => {
       });
     }
 
-    // Get user from Supabase
+    // IMPORTANT: case + space safe
+    const cleanEmail = email.trim().toLowerCase();
+
     const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('*')
-      .eq('email', email)
+      .eq('email', cleanEmail)
       .single();
 
     if (error || !user) {
@@ -60,7 +97,6 @@ const signIn = async (req, res) => {
       });
     }
 
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -70,24 +106,21 @@ const signIn = async (req, res) => {
       });
     }
 
-    // Create JWT token
     const token = jwt.sign(
       { id: user.id },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
 
-    // Set cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false,   // localhost only
+      secure: false,
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000 // 1 day
+      maxAge: 24 * 60 * 60 * 1000
     });
 
     console.log("LOGIN SUCCESS - COOKIE SET");
 
-    // Send JSON response (IMPORTANT for fetch)
     return res.status(200).json({
       success: true,
       message: "Login successful"
