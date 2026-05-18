@@ -1,15 +1,10 @@
-// controllers/taskController.js
-// =============================================
-// Task Controller (FIXED VERSION)
-// =============================================
-
 const { supabaseAdmin } = require('../config/supabase');
 
 const VALID_PRIORITIES = ['High', 'Medium', 'Low'];
 
-/* ---------------------------
+/* =========================
    GET TASKS
----------------------------- */
+========================= */
 const getTasks = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -41,8 +36,8 @@ const getTasks = async (req, res) => {
 
     return res.json({
       success: true,
-      count: tasks.length,
-      tasks
+      count: tasks?.length || 0,
+      tasks: tasks || []
     });
 
   } catch (err) {
@@ -50,9 +45,9 @@ const getTasks = async (req, res) => {
   }
 };
 
-/* ---------------------------
+/* =========================
    CREATE TASK
----------------------------- */
+========================= */
 const createTask = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -68,15 +63,17 @@ const createTask = async (req, res) => {
 
     const { data, error } = await supabaseAdmin
       .from('tasks')
-      .insert([{
-        user_id: userId,
-        title,
-        subject,
-        deadline,
-        priority,
-        notes,
-        completed: false
-      }])
+      .insert([
+        {
+          user_id: userId,
+          title,
+          subject,
+          deadline,
+          priority,
+          notes,
+          completed: false
+        }
+      ])
       .select()
       .single();
 
@@ -91,9 +88,9 @@ const createTask = async (req, res) => {
   }
 };
 
-/* ---------------------------
+/* =========================
    UPDATE TASK
----------------------------- */
+========================= */
 const updateTask = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -118,9 +115,9 @@ const updateTask = async (req, res) => {
   }
 };
 
-/* ---------------------------
+/* =========================
    DELETE TASK
----------------------------- */
+========================= */
 const deleteTask = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -133,7 +130,7 @@ const deleteTask = async (req, res) => {
       .eq('user_id', userId)
       .select();
 
-    if (error || !data.length) {
+    if (error || !data || data.length === 0) {
       return res.status(404).json({ success: false, message: 'Not found' });
     }
 
@@ -144,9 +141,9 @@ const deleteTask = async (req, res) => {
   }
 };
 
-/* ---------------------------
+/* =========================
    TOGGLE COMPLETE
----------------------------- */
+========================= */
 const toggleComplete = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -171,6 +168,10 @@ const toggleComplete = async (req, res) => {
       .select()
       .single();
 
+    if (error) {
+      return res.status(500).json({ success: false });
+    }
+
     return res.json({ success: true, task: data });
 
   } catch (err) {
@@ -178,50 +179,64 @@ const toggleComplete = async (req, res) => {
   }
 };
 
-/* ---------------------------
-   DASHBOARD
----------------------------- */
+/* =========================
+   DASHBOARD (FIXED ROOT CAUSE)
+========================= */
 const showDashboard = async (req, res) => {
   try {
     const userId = req.user.id;
+
+    const { data: user } = await supabaseAdmin
+      .from('users')
+      .select('id, name, email')
+      .eq('id', userId)
+      .single();
 
     const { data: tasks } = await supabaseAdmin
       .from('tasks')
       .select('*')
       .eq('user_id', userId);
 
+    const safeTasks = tasks || [];
+
+    const stats = {
+      total: safeTasks.length,
+      pending: safeTasks.filter(t => !t.completed).length,
+      completed: safeTasks.filter(t => t.completed).length,
+      overdue: 0
+    };
+
+    const subjects = [...new Set(
+      safeTasks.map(t => t.subject).filter(Boolean)
+    )];
+
     return res.render('dashboard', {
-      user: {
-        name: req.user?.name || "User",
-        email: req.user?.email || ""
-      },
-      tasks: tasks || [],
-      subjects: [],
-      stats: {
-        total: tasks?.length || 0,
-        pending: tasks?.filter(t => !t.completed).length || 0,
-        completed: tasks?.filter(t => t.completed).length || 0,
-        overdue: 0
-      }
+      user: user || { name: "User", email: "" },
+      tasks: safeTasks,
+      stats,        // ✅ ALWAYS SENT
+      subjects      // ✅ ALWAYS SENT
     });
 
   } catch (err) {
+    console.log("Dashboard error:", err);
+
     return res.render('dashboard', {
       user: { name: "User", email: "" },
       tasks: [],
-      subjects: [],
       stats: {
         total: 0,
         pending: 0,
         completed: 0,
         overdue: 0
-      }
+      },
+      subjects: []
     });
   }
 };
-/* ---------------------------
-   EXPORTS (IMPORTANT FIX)
----------------------------- */
+
+/* =========================
+   EXPORTS
+========================= */
 module.exports = {
   getTasks,
   createTask,
