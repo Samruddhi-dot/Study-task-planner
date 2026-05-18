@@ -22,16 +22,16 @@ const showSignIn = (req, res) => {
 };
 
 // ======================
-// SIGN UP (FIXED - NOW SAVES USER)
+// SIGN UP (FIXED - SUPPORTS NAME)
 // ======================
 const signUp = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!email || !password) {
+    if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required"
+        message: "Name, email and password are required"
       });
     }
 
@@ -41,6 +41,7 @@ const signUp = async (req, res) => {
       .from('users')
       .insert([
         {
+          name: name.trim(),
           email: email.trim().toLowerCase(),
           password: hashedPassword
         }
@@ -68,7 +69,7 @@ const signUp = async (req, res) => {
 };
 
 // ======================
-// SIGN IN (FIXED)
+// SIGN IN
 // ======================
 const signIn = async (req, res) => {
   try {
@@ -81,7 +82,6 @@ const signIn = async (req, res) => {
       });
     }
 
-    // IMPORTANT: case + space safe
     const cleanEmail = email.trim().toLowerCase();
 
     const { data: user, error } = await supabaseAdmin
