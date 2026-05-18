@@ -3,19 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Study Planner</title>
-
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
 </head>
-<body>
-  <h1>Study Planner</h1>
+<body class="home-page">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">📚</span>
+      <span class="brand-name">StudyPlanner</span>
+    </div>
+    <div class="nav-links">
+      <a href="/auth/signin" class="btn btn-ghost">Sign In</a>
+      <a href="/auth/signup" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
 
-  <a href="/auth/signup">Sign Up</a>
-  <a href="/auth/signin">Sign In</a>
+  <main class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">✨ Your academic companion</div>
+      <h1 class="hero-title">
+        Study smarter,<br>
+        <span class="accent">not harder.</span>
+      </h1>
+      <p class="hero-subtitle">
+        Organize your study tasks, track deadlines, set priorities, and 
+        conquer your academic goals — all in one beautiful planner.
+      </p>
+      <div class="hero-actions">
+        <a href="/auth/signup" class="btn btn-primary btn-lg">Start Planning Free</a>
+        <a href="/auth/signin" class="btn btn-outline btn-lg">I have an account</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">∞</span><span class="stat-label">Tasks</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">3</span><span class="stat-label">Priority levels</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Free</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="card-stack">
+        <div class="preview-card card-back"></div>
+        <div class="preview-card card-mid"></div>
+        <div class="preview-card card-front">
+          <div class="pc-header">
+            <span class="pc-dot red"></span>
+            <span class="pc-dot yellow"></span>
+            <span class="pc-dot green"></span>
+            <span class="pc-title">My Tasks</span>
+          </div>
+          <div class="pc-task high">
+            <span class="pc-check">✓</span>
+            <span>Read Chapter 5 — Biology</span>
+            <span class="pc-badge high">High</span>
+          </div>
+          <div class="pc-task medium pending">
+            <span class="pc-check empty"></span>
+            <span>Math Problem Set #3</span>
+            <span class="pc-badge medium">Medium</span>
+          </div>
+          <div class="pc-task low pending">
+            <span class="pc-check empty"></span>
+            <span>History Essay Draft</span>
+            <span class="pc-badge low">Low</span>
+          </div>
+          <div class="pc-task high pending overdue-preview">
+            <span class="pc-check empty"></span>
+            <span>Physics Lab Report</span>
+            <span class="pc-badge overdue">Overdue</span>
+          </div>
+          <div class="pc-footer">
+            <span>4 tasks · 1 completed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section class="features">
+    <h2 class="features-title">Everything you need to stay on top</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Priority Management</h3>
+        <p>Tag tasks as High, Medium, or Low priority. Focus on what matters most today.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Deadline Tracking</h3>
+        <p>Set deadlines and never miss a submission. Get an at-a-glance view of what's due.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📖</div>
+        <h3>Subject Organization</h3>
+        <p>Group tasks by subject — Math, Science, History — and filter to focus.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h3>Progress Tracking</h3>
+        <p>Check off completed tasks and watch your progress dashboard update in real-time.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Built with ❤️ using Node.js, Express &amp; Supabase</p>
+  </footer>
 </body>
 </html>
