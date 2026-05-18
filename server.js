@@ -67,21 +67,32 @@ const requireAuth = (req, res, next) => {
 // ======================
 app.get('/dashboard', requireAuth, async (req, res) => {
   try {
-    const { data: user } = await supabaseAdmin
+    const { data: user, error } = await supabaseAdmin
       .from('users')
-      .select('*')
+      .select('id, name, email')
       .eq('id', req.user.id)
       .single();
 
-    res.render('dashboard', {
-      user: user || { name: "User", email: "" },
-      stats: { total: 0, pending: 0, completed: 0, overdue: 0 },
+    // 🚨 IMPORTANT: handle Supabase error
+    if (error || !user) {
+      console.log("Supabase error:", error);
+      return res.redirect('/auth/signin');
+    }
+
+    return res.render('dashboard', {
+      user,
+      stats: {
+        total: 0,
+        pending: 0,
+        completed: 0,
+        overdue: 0
+      },
       tasks: [],
       subjects: []
     });
 
   } catch (err) {
-    console.log(err);
+    console.log("Dashboard crash:", err);
     return res.redirect('/auth/signin');
   }
 });
