@@ -60,12 +60,13 @@ const signUp = async (req, res) => {
     });
 
   } catch (err) {
-    console.log("SignUp Error:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Server error"
-    });
-  }
+  console.log("🔥 SIGNUP ERROR:", err);
+
+  return res.status(500).json({
+    success: false,
+    message: err.message
+  });
+}
 };
 
 // ======================
