@@ -36,9 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // HOME
 // ======================
 app.get('/', (req, res) => {
-  res.render('index', {
-    title: 'Study Planner'
-  });
+  res.render('index', { title: 'Study Planner' });
 });
 
 // ======================
@@ -64,9 +62,9 @@ const requireAuth = (req, res, next) => {
 // ROUTES
 // ======================
 app.use('/auth', authRoutes);
-app.use('/tasks', taskRoutes);
+app.use('/', taskRoutes);
 
-// ✅ SINGLE CLEAN DASHBOARD ROUTE
+// ✅ ONLY ONE DASHBOARD ROUTE (IMPORTANT)
 app.get('/dashboard', requireAuth, taskController.showDashboard);
 
 // ======================
