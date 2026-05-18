@@ -4,11 +4,19 @@ const { supabaseAdmin } = require('../config/supabase');
 
 // SHOW PAGES
 const showSignUp = (req, res) => {
-  res.render('signup');
+  res.render('signup', {
+    title: 'Study Planner',
+    error: null,
+    success: null
+  });
 };
 
 const showSignIn = (req, res) => {
-  res.render('signin');
+  res.render('signin', {
+    title: 'Study Planner',
+    error: null,
+    message: null
+  });
 };
 
 // AUTH ACTIONS
