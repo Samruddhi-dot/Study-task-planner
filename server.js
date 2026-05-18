@@ -10,6 +10,7 @@ const { errorHandler, notFound } = require('./middleware/errorHandler');
 
 const app = express();
 
+console.log("JWT_SECRET =", process.env.JWT_SECRET);
 // ======================
 // VIEW ENGINE
 // ======================
