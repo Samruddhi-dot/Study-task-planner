@@ -12,6 +12,9 @@ const { supabaseAdmin } = require('./config/supabase');
 
 const app = express();
 
+// ======================
+// DEBUG
+// ======================
 console.log("JWT_SECRET =", process.env.JWT_SECRET);
 
 // ======================
@@ -38,32 +41,34 @@ app.get('/', (req, res) => {
 });
 
 // ======================
-// ROUTES
+// AUTH ROUTES
 // ======================
 app.use('/auth', authRoutes);
 app.use('/', taskRoutes);
 
 // ======================
-// AUTH MIDDLEWARE
+// SAFE AUTH MIDDLEWARE
 // ======================
 const requireAuth = (req, res, next) => {
-  const token = req.cookies.token;
-
-  if (!token) {
-    return res.redirect('/auth/signin');
-  }
-
   try {
+    const token = req.cookies?.token;
+
+    if (!token) {
+      return res.redirect('/auth/signin');
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
+
     next();
   } catch (err) {
+    console.log("Auth error:", err.message);
     return res.redirect('/auth/signin');
   }
 };
 
 // ======================
-// DASHBOARD (FIXED)
+// DASHBOARD (SAFE)
 // ======================
 app.get('/dashboard', requireAuth, async (req, res) => {
   try {
@@ -73,14 +78,13 @@ app.get('/dashboard', requireAuth, async (req, res) => {
       .eq('id', req.user.id)
       .single();
 
-    // 🚨 IMPORTANT: handle Supabase error
     if (error || !user) {
-      console.log("Supabase error:", error);
+      console.log("Supabase error:", error?.message);
       return res.redirect('/auth/signin');
     }
 
     return res.render('dashboard', {
-      user,
+      user: user || { name: "User", email: "" },
       stats: {
         total: 0,
         pending: 0,
@@ -92,7 +96,7 @@ app.get('/dashboard', requireAuth, async (req, res) => {
     });
 
   } catch (err) {
-    console.log("Dashboard crash:", err);
+    console.log("Dashboard crash:", err.message);
     return res.redirect('/auth/signin');
   }
 });
